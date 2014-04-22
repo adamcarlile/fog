@@ -17,13 +17,15 @@ module Fog
         #
 
         def set_queue_attributes(queue_url, attribute_name, attribute_value)
-          request({
-            'Action'          => 'SetQueueAttributes',
-            'Attribute.Name'  => attribute_name,
-            'Attribute.Value' => attribute_value,
-            :path             => path_from_queue_url(queue_url),
-            :parser           => Fog::Parsers::AWS::SQS::Basic.new
-          })
+          hash = {
+            'Action'        => 'SetQueueAttributes',
+            :path           => path_from_queue_url(queue_url),
+            :parser         => Fog::Parsers::AWS::SQS::Basic.new
+          }
+          [attribute_name].flatten.each_with_index do |attribute, index|
+            hash["Attribute.entry.#{index + 1}"] = attribute
+          end
+          request(hash)
         end
 
       end
